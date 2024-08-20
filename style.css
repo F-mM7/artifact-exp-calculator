@@ -1,0 +1,58 @@
+.container {
+  display: flex;
+  flex-direction: row;
+}
+
+.container>div {
+  width: 99vw;
+}
+
+.margin {
+  display: block;
+  height: 10vh;
+}
+
+
+.pm {
+  display: inline-block;
+  width: 24px;
+}
+
+
+td {
+  text-align: right;
+}
+
+.invalid {
+  /* background-color: maroon; */
+  opacity: .3;
+}
+
+/* ==== base ==== */
+
+html {
+  touch-action: manipulation;
+}
+
+/* animation */
+.correct {
+  animation-name: correct;
+  animation-duration: 1s;
+}
+
+.incorrect {
+  animation-name: incorrect;
+  animation-duration: 1s;
+}
+
+@keyframes correct {
+  0% {
+    background-color: green;
+  }
+}
+
+@keyframes incorrect {
+  0% {
+    background-color: maroon;
+  }
+}

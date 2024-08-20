@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>artifact exp calculator</title>
+  <meta charset="UTF-8" />
+  <meta name="google" content="notranslate" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+  <script src="utility.js"></script>
+  <script src="main.js" defer></script>
+</head>
+
+<body>
+  <div>
+    <div>Enhancing Artifact</div>
+    <table id="enhancing">
+      <tr>
+        <th>Lv</label>
+        <td>
+          <input type="number" id="lv" value=4 min=0 max=20></number>
+        </td>
+      </tr>
+      <tr>
+        <th>Exp</th>
+        <td>
+          <input type="number" id="exp" value=0 min=0 max=35574></number>
+        </td>
+      </tr>
+    </table>
+
+
+  </div>
+
+  <div class="margin"></div>
+
+  <div>
+    <table>
+      <tr>
+        <th>exp req</td>
+        <td id="exp_req"></td>
+      </tr>
+      <tr>
+        <th>exp cap</td>
+        <td id="exp_cap"></td>
+      </tr>
+    </table>
+    <table id="mat"> </table>
+    <input id="given">
+    <button id="one">x1</button>
+    <button id="two">x2</button>
+    <button id="five">x5</button>
+  </div>
+
+  <div class="margin"></div>
+
+  <div>Target Artifact</div>
+  <div>
+    <textarea id="a"></textarea>
+    <button id="push">push</button>
+    <button id="clear">clear</button>
+    <a id="alert"></a>
+    <div id="list"> </div>
+    <table id="table">
+      <tr>
+        <th>Rate</th>
+        <th>DMG</th>
+      </tr>
+    </table>
+  </div>
+
+
+
+</body>
+
+</html>
