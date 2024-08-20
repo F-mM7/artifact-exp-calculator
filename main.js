@@ -29,7 +29,7 @@ const mat = { lv1: 420, lv2: 840, lv3: 1260, lv4: 2520, unc: 2500, ess: 10000 }
 const factor = [1, 2, 5]
 
 for (let i = 0; i < st_num; ++i)  $("#enhancing").append(state(i));
-for (x in mat) {
+for (let x in mat) {
   const r = $("<tr>")
   const c = $("<input>", { "type": "checkbox", "id": x + "_check" }).on("change", calc)
   if (mat[x] > 1e3) c.prop("checked", true);
@@ -50,9 +50,8 @@ $("#clear").on("click", () => {
   $("#a").val("");
 })
 
+for (let x of factor) $("#x" + x).on("click", give.bind(0, x))
 
-//test
-$("#a").val("7.0 	28.8 6.6 	26.4 3.9 	7.0 7.0 	21.8 10.1 	7.8 3.1 	6.2");
 
 calc();
 
@@ -64,7 +63,7 @@ function calc() {
 
 
   const exp_req = target_exp - current_exp
-  const exp_cap = (cum_exp[20] - current_exp) / 5
+  const exp_cap = (cum_exp[20] - current_exp) / 2
   $("#exp_req").text(exp_req)
   $("#exp_cap").text(exp_cap)
 
@@ -74,22 +73,36 @@ function calc() {
 
 function calc_mat(x) {
   const arr = [];
-  for (k in mat)
+  let sum = 0;
+  for (let k in mat)
     if ($('#' + k + "_check").prop("checked")) arr.push(k);
     else $('#' + k).text(0)
   arr.sort((a, b) => mat[b] - mat[a])
-  for (k of arr) {
+  for (let k of arr) {
     const t = Math.floor(x / mat[k])
     $('#' + k).text(t)
     x -= t * mat[k]
+    sum += t * mat[k];
   }
-
 
   if (x > 0) {
     const k = arr[arr.length - 1]
     $('#' + k).text(Number($('#' + k).text()) + 1)
+    sum += mat[k];
   }
 
+  $("#given").val(sum);
+}
+
+function give(x) {
+  let lv = Number($("#lv").val());
+  let exp = Number($("#exp").val()) + cum_exp[lv];
+  exp += $("#given").val() * x
+  while (lv < 20 && cum_exp[lv + 1] <= exp) ++lv;
+
+  $("#lv").val(lv)
+  $("#exp").val(exp - cum_exp[lv])
+  calc()
 }
 
 function state(i) {
@@ -129,9 +142,12 @@ function judge_n(n) {
   return 0;
 }
 function judge_arr(arr) {
-  for (x of data)
+  for (let x of data) {
+    let flag = 0;
     for (let i = 0; i < st_num; ++i)
-      if (get_val(i) + unit[i] * 10 * arr[i] < x[i]) return 0;
+      if (get_val(i) + unit[i] * 10 * arr[i] > x[i]) flag = 1;
+    if (!flag) return 0;
+  }
   return 1;
 }
 
@@ -150,7 +166,7 @@ function make_table() {//not support changing st_num
     for (let j = i + 1; j < N; ++j)
       if (data[i][0] >= data[j][0] && data[i][1] >= data[j][1]) data[j][2] = 0;
 
-  for (x of data) {
+  for (let x of data) {
     const tr = $("<tr>")
       .addClass("data")
       .append($("<td>").text(x[0].toFixed(1)))
