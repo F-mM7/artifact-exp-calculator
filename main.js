@@ -117,7 +117,7 @@ function state(i) {
       calc()
     }
   );
-  const p = $("<button>", { class: "pm", text: "+" }).on("click", () => {
+  const p = $("<button>", { class: "pm", text: "+", "tabindex": -1 }).on("click", () => {
     let n = internal(input.val(), unit[i]) + 1;
     if (0 < n && n < 7) n = 7;
     if (10 < n && n < 14) n = 14;
@@ -125,7 +125,7 @@ function state(i) {
     input.val(display(n, unit[i]));
     calc();
   });
-  const m = $("<button>", { class: "pm", text: "-" }).on("click", () => {
+  const m = $("<button>", { class: "pm", text: "-", "tabindex": -1 }).on("click", () => {
     let n = internal(input.val(), unit[i]) - 1;
     if (n < 0) n = 0;
     if (0 < n && n < 7) n = 0;
