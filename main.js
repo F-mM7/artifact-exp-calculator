@@ -39,7 +39,6 @@ for (let x in mat) {
   $("#mat").append(r)
 }
 
-
 $("#lv").on("change", calc)
 $("#exp").on("change", calc)
 
@@ -52,7 +51,6 @@ $("#clear").on("click", () => {
 
 for (let x of factor) $("#x" + x).on("click", give.bind(0, x))
 
-
 calc();
 
 function calc() {
@@ -60,7 +58,6 @@ function calc() {
   const target_lv = Math.min(20, (6 - required_enhance()) * 4)
   const current_exp = Number($("#exp").val()) + cum_exp[current_lv];
   const target_exp = cum_exp[Math.max(target_lv, current_lv)];
-
 
   const exp_req = target_exp - current_exp
   const exp_cap = (cum_exp[20] - current_exp) / 2
@@ -77,7 +74,9 @@ function calc_mat(x) {
   for (let k in mat)
     if ($('#' + k + "_check").prop("checked")) arr.push(k);
     else $('#' + k).text(0)
+
   arr.sort((a, b) => mat[b] - mat[a])
+
   for (let k of arr) {
     const t = Math.floor(x / mat[k])
     $('#' + k).text(t)
@@ -198,8 +197,6 @@ function push() {//not support changing st_num
 
   calc()
 }
-
-
 
 function internal(x, unit) {
   return Math.ceil(x / unit);
