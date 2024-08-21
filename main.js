@@ -112,7 +112,10 @@ function state(i) {
   const input = $("<input>", { id: st_name[i], value: (Math.floor(unit[i] * 70) / 10).toFixed(1) });
   input.on(
     "change",
-    () => input.val(display(internal(input.val(), unit[i]), unit[i]))
+    () => {
+      input.val(display(internal(input.val(), unit[i]), unit[i]))
+      calc()
+    }
   );
   const p = $("<button>", { class: "pm", text: "+" }).on("click", () => {
     let n = internal(input.val(), unit[i]) + 1;
