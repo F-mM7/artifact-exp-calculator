@@ -58,7 +58,7 @@ function checked(mat_name) {
 }
 
 function calc_mat(x) {
-  let sum = x * 2;
+  let sum = 280001;
   let arr = {};
   for (let n4 = 15; n4 >= 0; --n4)
     for (let n3 = 15; n3 >= 0; --n3)
