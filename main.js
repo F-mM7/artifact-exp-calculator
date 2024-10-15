@@ -17,7 +17,7 @@ for (let x in mat) {
     "change",
     calc
   );
-  if (mat[x] > 1e3) c.prop("checked", true);
+  c.prop("checked", true);
   $("<td>").append(c).appendTo(r);
   $("<td>").text(x).appendTo(r);
   $("<td>", { id: x, text: 0 }).appendTo(r);
