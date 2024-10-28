@@ -1,12 +1,14 @@
 const st_num = 2;
-const st_name = ["Rate", "DMG"];
-const unit = [0.39, 0.78];
+const st_name = ["CRIT_Rate", "CRIT_DMG"];
 const cum_exp = [
   0, 3000, 6725, 11150, 16300, 22200, 28875, 36375, 44725, 53950, 64075, 75125,
   87150, 100175, 115325, 132925, 153300, 176800, 203850, 234900, 270475,
 ];
 const data = [];
 const mat = { lv1: 420, lv2: 840, lv3: 1260, lv4: 2520, unc: 2500, ess: 10000 };
+
+const st_base={DEF:58.3, Energy_Recharge:51.8,CRIT_Rate:31.1, CRIT_DMG:62.2};
+
 
 const factor = [1, 2, 5];
 
@@ -51,6 +53,8 @@ function calc() {
 
   const exp_give = Math.min(exp_req, exp_cap);
   calc_mat(exp_give);
+
+  console.log("calculated")
 }
 
 function checked(mat_name) {
@@ -135,31 +139,24 @@ function state(i) {
   const d = $("<td>");
   const input = $("<input>", {
     id: st_name[i],
-    value: (Math.floor(unit[i] * 70) / 10).toFixed(1),
+    type: "number",
+    step:0.1,
+    value: (Math.floor(st_base[st_name[i]]/80 * 70) / 10).toFixed(1),
   });
   input.on("change", () => {
-    input.val(display(internal(input.val(), unit[i]), unit[i]));
     calc();
   });
   const p = $("<button>", { class: "pm", text: "+", tabindex: -1 }).on(
     "click",
     () => {
-      let n = internal(input.val(), unit[i]) + 1;
-      if (0 < n && n < 7) n = 7;
-      if (10 < n && n < 14) n = 14;
-      if (60 < n) n = 60;
-      input.val(display(n, unit[i]));
+      input.val(display_new(Number(input.val()) + st_base[st_name[i]] / 8));
       calc();
     }
   );
   const m = $("<button>", { class: "pm", text: "-", tabindex: -1 }).on(
     "click",
     () => {
-      let n = internal(input.val(), unit[i]) - 1;
-      if (n < 0) n = 0;
-      if (0 < n && n < 7) n = 0;
-      if (10 < n && n < 14) n = 10;
-      input.val(display(n, unit[i]));
+      input.val(display_new(Number(input.val()) - st_base[st_name[i]] / 8));
       calc();
     }
   );
@@ -182,7 +179,7 @@ function judge_arr(arr) {
   for (let x of data) {
     let flag = 0;
     for (let i = 0; i < st_num; ++i)
-      if (get_val(i) + unit[i] * 10 * arr[i] > x[i]) flag = 1;
+      if (get_val(i) + st_base[st_name[i]]/8 * arr[i] > x[i]) flag = 1;
     if (!flag) return 0;
   }
   return 1;
@@ -236,9 +233,6 @@ function push() {
   calc();
 }
 
-function internal(x, unit) {
-  return Math.ceil(x / unit);
-}
-function display(x, unit) {
-  return (Math.floor(x * unit * 10) / 10).toFixed(1);
+function display(x) {
+  return (Math.floor(x *  10) / 10).toFixed(1);
 }
