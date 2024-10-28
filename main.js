@@ -1,5 +1,5 @@
-const st_num = 2;
-const st_name = ["CRIT_Rate", "CRIT_DMG"];
+const st = ["CRIT_Rate", "CRIT_DMG"];
+// const st = ["DEF", "Energy_Recharge"];
 const cum_exp = [
   0, 3000, 6725, 11150, 16300, 22200, 28875, 36375, 44725, 53950, 64075, 75125,
   87150, 100175, 115325, 132925, 153300, 176800, 203850, 234900, 270475,
@@ -12,7 +12,7 @@ const st_base={DEF:58.3, Energy_Recharge:51.8,CRIT_Rate:31.1, CRIT_DMG:62.2};
 
 const factor = [1, 2, 5];
 
-for (let i = 0; i < st_num; ++i) $("#enhancing").append(state(i));
+for (let i = 0; i < st.length; ++i) $("#enhancing").append(state(i));
 for (let x in mat) {
   const r = $("<tr>");
   const c = $("<input>", { type: "checkbox", id: x + "_check" }).on(
@@ -135,13 +135,13 @@ function give(x) {
 
 function state(i) {
   const r = $("<tr>");
-  r.append($("<th>").text(st_name[i]));
+  r.append($("<th>").text(st[i]));
   const d = $("<td>");
   const input = $("<input>", {
-    id: st_name[i],
+    id: st[i],
     type: "number",
     step:0.1,
-    value: (Math.floor(st_base[st_name[i]]/80 * 70) / 10).toFixed(1),
+    value: (Math.floor(st_base[st[i]]/80 * 70) / 10).toFixed(1),
   });
   input.on("change", () => {
     calc();
@@ -149,14 +149,14 @@ function state(i) {
   const p = $("<button>", { class: "pm", text: "+", tabindex: -1 }).on(
     "click",
     () => {
-      input.val(display_new(Number(input.val()) + st_base[st_name[i]] / 8));
+      input.val(display(Number(input.val()) + st_base[st[i]] / 8));
       calc();
     }
   );
   const m = $("<button>", { class: "pm", text: "-", tabindex: -1 }).on(
     "click",
     () => {
-      input.val(display_new(Number(input.val()) - st_base[st_name[i]] / 8));
+      input.val(display(Number(input.val()) - st_base[st[i]] / 8));
       calc();
     }
   );
@@ -165,7 +165,7 @@ function state(i) {
 }
 
 function get_val(i) {
-  return Number($("#" + st_name[i]).val());
+  return Number($("#" + st[i]).val());
 }
 
 function required_enhance() {
@@ -178,15 +178,15 @@ function judge_n(n) {
 function judge_arr(arr) {
   for (let x of data) {
     let flag = 0;
-    for (let i = 0; i < st_num; ++i)
-      if (get_val(i) + st_base[st_name[i]]/8 * arr[i] > x[i]) flag = 1;
+    for (let i = 0; i < st.length; ++i)
+      if (get_val(i) + st_base[st[i]]/8 * arr[i] > x[i]) flag = 1;
     if (!flag) return 0;
   }
   return 1;
 }
 
 function make_table() {
-  //not support changing st_num
+  //not support changing st.length
 
   $(".data").remove();
 
@@ -213,17 +213,17 @@ function make_table() {
 }
 
 function push() {
-  //not support changing st_num
+  //not support changing st.length
   let arr = $("#a")
     .val()
     .match(/[0-9]+\.?[0-9]*/g);
-  if (arr == null || arr.length % st_num != 0) {
+  if (arr == null || arr.length % st.length != 0) {
     $("#alert").text("error!");
     return;
   }
   $("#alert").text("");
   arr = arr.map((s) => Number(s));
-  for (let i = 0; i < arr.length; i += st_num)
+  for (let i = 0; i < arr.length; i += st.length)
     data.push([arr[i], arr[i + 1], 1]);
 
   make_table();
