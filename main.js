@@ -7,7 +7,7 @@ const cum_exp = [
 const data = [];
 const mat = { lv1: 420, lv2: 840, lv3: 1260, lv4: 2520, unc: 2500, ess: 10000 };
 
-const st_base = {
+const base_value = {
   DEF: 58.3,
   Energy_Recharge: 51.8,
   CRIT_Rate: 31.1,
@@ -16,7 +16,11 @@ const st_base = {
 
 const factor = [1, 2, 5];
 
-for (let i = 0; i < st.length; ++i) $("#enhancing").append(state(i));
+for (let s of st) {
+  $("#enhancing").append(state_indicator(s));
+  $("#headers").append($("<th>").text(s));
+}
+
 for (let x in mat) {
   const r = $("<tr>");
   const c = $("<input>", { type: "checkbox", id: x + "_check" }).on(
@@ -102,15 +106,12 @@ function calc_mat(x) {
                 unc: 0,
               };
               if (use_unc) {
-                if (use_ess) {
-                  t_arr["ess"] = Math.max(
-                    Math.floor((x - t_sum) / mat["ess"]),
-                    0
-                  );
-                  t_sum += t_arr["ess"] * mat["ess"];
-                }
                 t_arr["unc"] = Math.max(Math.ceil((x - t_sum) / mat["unc"]), 0);
                 t_sum += t_arr["unc"] * mat["unc"];
+                if (use_ess) {
+                  t_arr["ess"] = Math.floor(t_arr["unc"] / 4);
+                  t_arr["unc"] = t_arr["unc"] % 4;
+                }
               } else if (use_ess) {
                 t_arr["ess"] = Math.max(Math.ceil((x - t_sum) / mat["ess"]), 0);
                 t_sum += t_arr["ess"] * mat["ess"];
@@ -137,30 +138,37 @@ function give(x) {
   calc();
 }
 
-function state(i) {
+function state_indicator(s) {
   const r = $("<tr>");
-  r.append($("<th>").text(st[i]));
+  r.append($("<th>").text(s));
   const d = $("<td>");
   const input = $("<input>", {
-    id: st[i],
+    id: s,
     type: "number",
     step: 0.1,
-    value: (Math.floor((st_base[st[i]] / 80) * 70) / 10).toFixed(1),
+    min: 0,
+    max: display((base_value[s] / 8) * 6),
+    value: display((base_value[s] / 8) * 0.9),
   });
-  input.on("change", () => {
-    calc();
-  });
+  input.on("change", calc);
   const p = $("<button>", { class: "pm", text: "+", tabindex: -1 }).on(
     "click",
     () => {
-      input.val(display(Number(input.val()) + st_base[st[i]] / 8));
+      input.val(
+        Math.min(
+          display((base_value[s] / 8) * 6),
+          display(Number(input.val()) + (base_value[s] / 8) * 0.85)
+        )
+      );
       calc();
     }
   );
   const m = $("<button>", { class: "pm", text: "-", tabindex: -1 }).on(
     "click",
     () => {
-      input.val(display(Number(input.val()) - st_base[st[i]] / 8));
+      input.val(
+        Math.max(0, display(Number(input.val()) - (base_value[s] / 8) * 0.85))
+      );
       calc();
     }
   );
@@ -168,8 +176,16 @@ function state(i) {
   return r;
 }
 
-function get_val(i) {
-  return Number($("#" + st[i]).val());
+function get_val(s) {
+  return Number($("#" + s).val());
+}
+
+function required_enhance_new() {
+  let ans = 100;
+  for (let a1 = 0; a1 < N; ++a1)
+    for (let i = 0; ; ++i) if (judge_n(i)) return i;
+
+  return ans;
 }
 
 function required_enhance() {
@@ -183,7 +199,7 @@ function judge_arr(arr) {
   for (let x of data) {
     let flag = 0;
     for (let i = 0; i < st.length; ++i)
-      if (get_val(i) + (st_base[st[i]] / 8) * arr[i] > x[i]) flag = 1;
+      if (get_val(st[i]) + (base_value[st[i]] / 8) * arr[i] > x[i]) flag = 1;
     if (!flag) return 0;
   }
   return 1;
@@ -217,7 +233,7 @@ function make_table() {
 }
 
 function push() {
-  //not support changing st.length
+  //not support changing st
   let arr = $("#a")
     .val()
     .match(/[0-9]+\.?[0-9]*/g);
@@ -238,5 +254,5 @@ function push() {
 }
 
 function display(x) {
-  return (Math.floor(x * 10) / 10).toFixed(1);
+  return (Math.round(x * 10) / 10).toFixed(1);
 }
