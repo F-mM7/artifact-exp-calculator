@@ -7,8 +7,12 @@ const cum_exp = [
 const data = [];
 const mat = { lv1: 420, lv2: 840, lv3: 1260, lv4: 2520, unc: 2500, ess: 10000 };
 
-const st_base={DEF:58.3, Energy_Recharge:51.8,CRIT_Rate:31.1, CRIT_DMG:62.2};
-
+const st_base = {
+  DEF: 58.3,
+  Energy_Recharge: 51.8,
+  CRIT_Rate: 31.1,
+  CRIT_DMG: 62.2,
+};
 
 const factor = [1, 2, 5];
 
@@ -41,10 +45,15 @@ for (let x of factor) $("#x" + x).on("click", give.bind(0, x));
 calc();
 
 function calc() {
+  let t = performance.now();
+
   const current_lv = Number($("#lv").val());
   const target_lv = Math.min(20, (6 - required_enhance()) * 4);
   const current_exp = Number($("#exp").val()) + cum_exp[current_lv];
   const target_exp = cum_exp[Math.max(target_lv, current_lv)];
+
+  console.log("required_enhance", performance.now() - t);
+  t = performance.now();
 
   const exp_req = target_exp - current_exp;
   const exp_cap = (cum_exp[20] - current_exp) / 2;
@@ -54,7 +63,9 @@ function calc() {
   const exp_give = Math.min(exp_req, exp_cap);
   calc_mat(exp_give);
 
-  console.log("calculated")
+  console.log("calc_mat", performance.now() - t);
+
+  console.log("calculated");
 }
 
 function checked(mat_name) {
@@ -65,9 +76,9 @@ function calc_mat(x) {
   let sum = 280001;
   let arr = {};
   for (let n4 = 15; n4 >= 0; --n4)
-    for (let n3 = 15; n3 >= 0; --n3)
-      for (let n2 = 15; n2 >= 0; --n2)
-        for (let n1 = 15; n1 >= 0; --n1)
+    for (let n3 = 15 - n4; n3 >= 0; --n3)
+      for (let n2 = 15 - n4 - n3; n2 >= 0; --n2)
+        for (let n1 = 15 - n4 - n3 - n2; n1 >= 0; --n1)
           for (let use_ess = 1; use_ess >= 0; --use_ess)
             for (let use_unc = 0; use_unc < 2; ++use_unc) {
               if (n4 && !checked("lv4")) continue;
@@ -76,14 +87,7 @@ function calc_mat(x) {
               if (n1 && !checked("lv1")) continue;
               if (use_ess && !checked("ess")) continue;
               if (use_unc && !checked("unc")) continue;
-              let c = 0;
-              c += n4;
-              c += n3;
-              c += n2;
-              c += n1;
-              c += use_ess;
-              c += use_unc;
-              if (c > 15) continue;
+              if (n1 + n2 + n3 + n4 + use_ess + use_unc > 15) continue;
               let t_sum = 0;
               t_sum += n4 * mat["lv4"];
               t_sum += n3 * mat["lv3"];
@@ -140,8 +144,8 @@ function state(i) {
   const input = $("<input>", {
     id: st[i],
     type: "number",
-    step:0.1,
-    value: (Math.floor(st_base[st[i]]/80 * 70) / 10).toFixed(1),
+    step: 0.1,
+    value: (Math.floor((st_base[st[i]] / 80) * 70) / 10).toFixed(1),
   });
   input.on("change", () => {
     calc();
@@ -179,7 +183,7 @@ function judge_arr(arr) {
   for (let x of data) {
     let flag = 0;
     for (let i = 0; i < st.length; ++i)
-      if (get_val(i) + st_base[st[i]]/8 * arr[i] > x[i]) flag = 1;
+      if (get_val(i) + (st_base[st[i]] / 8) * arr[i] > x[i]) flag = 1;
     if (!flag) return 0;
   }
   return 1;
@@ -234,5 +238,5 @@ function push() {
 }
 
 function display(x) {
-  return (Math.floor(x *  10) / 10).toFixed(1);
+  return (Math.floor(x * 10) / 10).toFixed(1);
 }
