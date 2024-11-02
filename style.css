@@ -3,21 +3,19 @@
   flex-direction: row;
 }
 
-.container>div {
+.container > div {
   width: 99vw;
 }
 
 .margin {
   display: block;
-  height: 10vh;
+  height: 6vh;
 }
-
 
 .pm {
   display: inline-block;
   width: 24px;
 }
-
 
 td {
   text-align: right;
@@ -25,12 +23,13 @@ td {
 
 .invalid {
   /* background-color: maroon; */
-  opacity: .3;
+  opacity: 0.3;
 }
 
 /* ==== base ==== */
 
 html {
+  user-select: none;
   touch-action: manipulation;
 }
 

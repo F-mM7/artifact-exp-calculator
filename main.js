@@ -1,24 +1,58 @@
-const st = ["CRIT_Rate", "CRIT_DMG"];
-// const st = ["DEF", "Energy_Recharge"];
-const cum_exp = [
-  0, 3000, 6725, 11150, 16300, 22200, 28875, 36375, 44725, 53950, 64075, 75125,
-  87150, 100175, 115325, 132925, 153300, 176800, 203850, 234900, 270475,
-];
-const data = [];
-const mat = { lv1: 420, lv2: 840, lv3: 1260, lv4: 2520, unc: 2500, ess: 10000 };
-
-const base_value = {
+const st = {
   DEF: 58.3,
   Energy_Recharge: 51.8,
   CRIT_Rate: 31.1,
   CRIT_DMG: 62.2,
 };
+const selected_st = ["CRIT_Rate", "CRIT_DMG"];
 
+const cum_exp = [
+  0, 3000, 6725, 11150, 16300, 22200, 28875, 36375, 44725, 53950, 64075, 75125,
+  87150, 100175, 115325, 132925, 153300, 176800, 203850, 234900, 270475,
+];
+const list = [];
+const mat = { lv1: 420, lv2: 840, lv3: 1260, lv4: 2520, unc: 2500, ess: 10000 };
 const factor = [1, 2, 5];
 
-for (let s of st) {
-  $("#enhancing").append(state_indicator(s));
-  $("#headers").append($("<th>").text(s));
+for (let s in st) {
+  const d = $("<div>");
+
+  d.append(
+    $("<input>", {
+      type: "checkbox",
+      id: s + "_checkbox",
+    }).on("change", reflect_selection)
+  );
+
+  d.append(
+    $("<label>", {
+      text: s,
+      for: s + "_checkbox",
+    })
+  );
+
+  $("#select").append(d);
+}
+
+//default selection
+$("#CRIT_Rate_checkbox").prop("checked", 1);
+$("#CRIT_DMG_checkbox").prop("checked", 1);
+
+reflect_selection();
+
+function reflect_selection() {
+  selected_st.splice(0);
+  for (let s in st)
+    if ($("#" + s + "_checkbox").prop("checked")) selected_st.push(s);
+
+  $("#enhancing").empty();
+  $("#headers").empty();
+
+  for (let s of selected_st) {
+    $("#enhancing").append(state_indicator(s));
+    $("#headers").append($("<th>").text(s));
+  }
+  clear_list();
 }
 
 for (let x in mat) {
@@ -38,11 +72,13 @@ $("#lv").on("change", calc);
 $("#exp").on("change", calc);
 
 $("#push").on("click", push);
-$("#clear").on("click", () => {
-  data.splice(0);
+$("#clear").on("click", clear_list);
+
+function clear_list() {
+  list.splice(0);
   make_table();
   $("#a").val("");
-});
+}
 
 for (let x of factor) $("#x" + x).on("click", give.bind(0, x));
 
@@ -147,8 +183,8 @@ function state_indicator(s) {
     type: "number",
     step: 0.1,
     min: 0,
-    max: display((base_value[s] / 8) * 6),
-    value: display((base_value[s] / 8) * 0.9),
+    max: display((st[s] / 8) * 6),
+    value: display((st[s] / 8) * 0.9),
   });
   input.on("change", calc);
   const p = $("<button>", { class: "pm", text: "+", tabindex: -1 }).on(
@@ -156,8 +192,8 @@ function state_indicator(s) {
     () => {
       input.val(
         Math.min(
-          display((base_value[s] / 8) * 6),
-          display(Number(input.val()) + (base_value[s] / 8) * 0.85)
+          display((st[s] / 8) * 6),
+          display(Number(input.val()) + (st[s] / 8) * 0.85)
         )
       );
       calc();
@@ -166,9 +202,7 @@ function state_indicator(s) {
   const m = $("<button>", { class: "pm", text: "-", tabindex: -1 }).on(
     "click",
     () => {
-      input.val(
-        Math.max(0, display(Number(input.val()) - (base_value[s] / 8) * 0.85))
-      );
+      input.val(Math.max(0, display(Number(input.val()) - (st[s] / 8) * 0.85)));
       calc();
     }
   );
@@ -180,29 +214,28 @@ function get_val(s) {
   return Number($("#" + s).val());
 }
 
-function required_enhance_new() {
-  let ans = 100;
-  for (let a1 = 0; a1 < N; ++a1)
-    for (let i = 0; ; ++i) if (judge_n(i)) return i;
-
-  return ans;
-}
-
 function required_enhance() {
-  for (let i = 0; ; ++i) if (judge_n(i)) return i;
-}
-function judge_n(n) {
-  for (let i = 0; i <= n; ++i) if (judge_arr([i, n - i])) return 1;
-  return 0;
-}
-function judge_arr(arr) {
-  for (let x of data) {
-    let flag = 0;
-    for (let i = 0; i < st.length; ++i)
-      if (get_val(st[i]) + (base_value[st[i]] / 8) * arr[i] > x[i]) flag = 1;
-    if (!flag) return 0;
+  let ans = 100;
+  const arrays = enumerateArrays(selected_st.length, 6);
+  for (let a of arrays) {
+    let new_val = [];
+    for (let i in selected_st)
+      new_val[i] = get_val(selected_st[i]) + (st[selected_st[i]] / 8) * a[i];
+
+    let inf = 0;
+    for (let data of list) {
+      let sup = 0;
+      for (let i in selected_st) if (new_val[i] > data.val[i]) sup = 1;
+      if (!sup) inf = 1;
+    }
+
+    let s = a.reduce((s, x) => s + x, 0);
+
+    if (!inf && s < ans) {
+      ans = s;
+    }
   }
-  return 1;
+  return ans;
 }
 
 function make_table() {
@@ -210,24 +243,25 @@ function make_table() {
 
   $(".data").remove();
 
-  data.sort((a, b) => {
-    if (a[0] * 2 + a[1] != b[0] * 2 + b[1])
-      return b[0] * 2 + b[1] - a[0] * 2 - a[1];
-    if (a[1] != b[1]) return b[1] - a[1];
-    return b[2] - a[2];
-  });
+  //TODO sortの実装
+  // list.sort((a, b) => {
+  //   if (a[0] * 2 + a[1] != b[0] * 2 + b[1])
+  //     return b[0] * 2 + b[1] - a[0] * 2 - a[1];
+  //   if (a[1] != b[1]) return b[1] - a[1];
+  //   return b[2] - a[2];
+  // });
 
-  const N = data.length;
-  for (let i = 0; i < N; ++i)
-    for (let j = i + 1; j < N; ++j)
-      if (data[i][0] >= data[j][0] && data[i][1] >= data[j][1]) data[j][2] = 0;
+  //TODO validity check の実装
+  for (let i = 0; i < list.length; ++i) {
+    console.log(list[i].val);
+    for (let j = i + 1; j < list.length; ++j) {}
+  }
 
-  for (let x of data) {
-    const tr = $("<tr>")
-      .addClass("data")
-      .append($("<td>").text(x[0].toFixed(1)))
-      .append($("<td>").text(x[1].toFixed(1)));
-    if (!x[2]) tr.addClass("invalid");
+  for (let x of list) {
+    const tr = $("<tr>").addClass("data");
+    for (let i = 0; i < selected_st.length; ++i)
+      tr.append($("<td>").text(x.val[i].toFixed(1)));
+    if (!x.validity) tr.addClass("invalid");
     $("#table").append(tr);
   }
 }
@@ -237,14 +271,17 @@ function push() {
   let arr = $("#a")
     .val()
     .match(/[0-9]+\.?[0-9]*/g);
-  if (arr == null || arr.length % st.length != 0) {
+  if (arr == null || arr.length % selected_st.length != 0) {
     $("#alert").text("error!");
     return;
   }
   $("#alert").text("");
   arr = arr.map((s) => Number(s));
-  for (let i = 0; i < arr.length; i += st.length)
-    data.push([arr[i], arr[i + 1], 1]);
+  for (let i = 0; i < arr.length; i += selected_st.length) {
+    data = { val: [], validity: true };
+    for (let j = 0; j < selected_st.length; ++j) data.val.push(arr[i + j]);
+    list.push(data);
+  }
 
   make_table();
 
@@ -255,4 +292,25 @@ function push() {
 
 function display(x) {
   return (Math.round(x * 10) / 10).toFixed(1);
+}
+
+function enumerateArrays(n, m) {
+  let result = [];
+
+  // 再帰関数で全ての組み合わせを生成
+  function generateArray(currentArray) {
+    if (currentArray.length === n) {
+      result.push([...currentArray]);
+      return;
+    }
+
+    for (let i = 0; i < m; i++) {
+      currentArray.push(i);
+      generateArray(currentArray);
+      currentArray.pop();
+    }
+  }
+
+  generateArray([]);
+  return result;
 }
