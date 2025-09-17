@@ -73,7 +73,7 @@ export const ArtifactEnhancer: React.FC<ArtifactEnhancerProps> = ({
                   step={0.1}
                   min={0}
                   max={display((SUBSTATS[substat] / 8) * 6)}
-                  value={substatValues[substat] || display((SUBSTATS[substat] / 8) * 0.9)}
+                  value={substatValues[substat] !== undefined ? substatValues[substat] : display((SUBSTATS[substat] / 8) * 0.9)}
                   onChange={(e) => onSubstatValueChange(substat, Number(e.target.value))}
                 />
               </td>

@@ -42,6 +42,8 @@ function App() {
   const [expCap, setExpCap] = useState(0);
   const [givenExp, setGivenExp] = useState(0);
   const [capDivisor, setCapDivisor] = useState(2);
+  const [useManualTargetLevel, setUseManualTargetLevel] = useState(false);
+  const [manualTargetLevel, setManualTargetLevel] = useState(8);
 
   // Initialize substat values when selected substats change
   useEffect(() => {
@@ -58,7 +60,8 @@ function App() {
 
   const calculate = useCallback(() => {
     const requiredEnhances = calculateRequiredEnhances(selectedSubstats, substatValues, targetArtifacts);
-    const { expReq: calcExpReq, expCap: calcExpCap } = calculateExpRequirement(level, exp, requiredEnhances, capDivisor);
+    const targetLevel = useManualTargetLevel ? manualTargetLevel : undefined;
+    const { expReq: calcExpReq, expCap: calcExpCap } = calculateExpRequirement(level, exp, requiredEnhances, capDivisor, targetLevel);
 
     setExpReq(calcExpReq);
     setExpCap(calcExpCap);
@@ -68,7 +71,7 @@ function App() {
 
     setMaterialUsage(usage);
     setGivenExp(totalExp);
-  }, [selectedSubstats, substatValues, level, exp, targetArtifacts, enabledMaterials, capDivisor]);
+  }, [selectedSubstats, substatValues, level, exp, targetArtifacts, enabledMaterials, capDivisor, useManualTargetLevel, manualTargetLevel]);
 
   useEffect(() => {
     calculate();
@@ -84,6 +87,15 @@ function App() {
       ...prev,
       [substat]: value,
     }));
+  };
+
+  const handleLevelChange = (newLevel: number) => {
+    setLevel(newLevel);
+    // レベルが変更されたら、手動目標レベルも更新
+    if (!useManualTargetLevel) {
+      const nextMultipleOf4 = Math.ceil((newLevel + 1) / 4) * 4;
+      setManualTargetLevel(Math.min(20, nextMultipleOf4));
+    }
   };
 
   const handleMaterialToggle = (material: string) => {
@@ -122,7 +134,7 @@ function App() {
         exp={exp}
         selectedSubstats={selectedSubstats}
         substatValues={substatValues}
-        onLevelChange={setLevel}
+        onLevelChange={handleLevelChange}
         onExpChange={setExp}
         onSubstatValueChange={handleSubstatValueChange}
       />
@@ -136,9 +148,13 @@ function App() {
         givenExp={givenExp}
         enabledMaterials={enabledMaterials}
         capDivisor={capDivisor}
+        useManualTargetLevel={useManualTargetLevel}
+        manualTargetLevel={manualTargetLevel}
         onMaterialToggle={handleMaterialToggle}
         onExpGain={handleExpGain}
         onCapDivisorChange={setCapDivisor}
+        onManualTargetLevelToggle={setUseManualTargetLevel}
+        onManualTargetLevelChange={setManualTargetLevel}
       />
 
       <div className="margin"></div>

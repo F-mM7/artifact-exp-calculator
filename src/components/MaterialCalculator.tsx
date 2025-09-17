@@ -9,9 +9,13 @@ interface MaterialCalculatorProps {
   givenExp: number;
   enabledMaterials: { [key: string]: boolean };
   capDivisor: number;
+  useManualTargetLevel: boolean;
+  manualTargetLevel: number;
   onMaterialToggle: (material: string) => void;
   onExpGain: (multiplier: number) => void;
   onCapDivisorChange: (divisor: number) => void;
+  onManualTargetLevelToggle: (enabled: boolean) => void;
+  onManualTargetLevelChange: (level: number) => void;
 }
 
 export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
@@ -21,9 +25,13 @@ export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
   givenExp,
   enabledMaterials,
   capDivisor,
+  useManualTargetLevel,
+  manualTargetLevel,
   onMaterialToggle,
   onExpGain,
   onCapDivisorChange,
+  onManualTargetLevelToggle,
+  onManualTargetLevelChange,
 }) => {
   return (
     <div>
@@ -48,6 +56,27 @@ export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
                 <option value={2}>÷2</option>
                 <option value={5}>÷5</option>
               </select>
+            </td>
+          </tr>
+          <tr>
+            <th>target level</th>
+            <td>
+              <input
+                type="checkbox"
+                checked={useManualTargetLevel}
+                onChange={(e) => onManualTargetLevelToggle(e.target.checked)}
+              />
+              <label>Manual:</label>
+              <input
+                type="number"
+                min={0}
+                max={20}
+                step={4}
+                value={manualTargetLevel}
+                disabled={!useManualTargetLevel}
+                onChange={(e) => onManualTargetLevelChange(Number(e.target.value))}
+                style={{ width: '60px', marginLeft: '0.25rem' }}
+              />
             </td>
           </tr>
         </tbody>

@@ -29,9 +29,11 @@ export function calculateExpRequirement(
   currentLevel: number,
   currentExp: number,
   requiredEnhances: number,
-  capDivisor: number = 2
+  capDivisor: number = 2,
+  manualTargetLevel?: number
 ): { expReq: number; expCap: number } {
-  const targetLevel = Math.min(20, (6 - requiredEnhances) * 4);
+  const autoTargetLevel = Math.min(20, (6 - requiredEnhances) * 4);
+  const targetLevel = manualTargetLevel !== undefined ? manualTargetLevel : autoTargetLevel;
   const totalCurrentExp = currentExp + CUM_EXP[currentLevel];
   const targetExp = CUM_EXP[Math.max(targetLevel, currentLevel)];
 
