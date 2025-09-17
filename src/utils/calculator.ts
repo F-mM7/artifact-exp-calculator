@@ -28,14 +28,15 @@ export function enumerateArrays(n: number, m: number): number[][] {
 export function calculateExpRequirement(
   currentLevel: number,
   currentExp: number,
-  requiredEnhances: number
+  requiredEnhances: number,
+  capDivisor: number = 2
 ): { expReq: number; expCap: number } {
   const targetLevel = Math.min(20, (6 - requiredEnhances) * 4);
   const totalCurrentExp = currentExp + CUM_EXP[currentLevel];
   const targetExp = CUM_EXP[Math.max(targetLevel, currentLevel)];
 
   const expReq = targetExp - totalCurrentExp;
-  const expCap = (CUM_EXP[20] - totalCurrentExp) / 2;
+  const expCap = (CUM_EXP[20] - totalCurrentExp) / capDivisor;
 
   return { expReq, expCap };
 }

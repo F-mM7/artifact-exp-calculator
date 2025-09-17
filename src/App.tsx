@@ -41,6 +41,7 @@ function App() {
   const [expReq, setExpReq] = useState(0);
   const [expCap, setExpCap] = useState(0);
   const [givenExp, setGivenExp] = useState(0);
+  const [capDivisor, setCapDivisor] = useState(2);
 
   // Initialize substat values when selected substats change
   useEffect(() => {
@@ -57,7 +58,7 @@ function App() {
 
   const calculate = useCallback(() => {
     const requiredEnhances = calculateRequiredEnhances(selectedSubstats, substatValues, targetArtifacts);
-    const { expReq: calcExpReq, expCap: calcExpCap } = calculateExpRequirement(level, exp, requiredEnhances);
+    const { expReq: calcExpReq, expCap: calcExpCap } = calculateExpRequirement(level, exp, requiredEnhances, capDivisor);
 
     setExpReq(calcExpReq);
     setExpCap(calcExpCap);
@@ -67,7 +68,7 @@ function App() {
 
     setMaterialUsage(usage);
     setGivenExp(totalExp);
-  }, [selectedSubstats, substatValues, level, exp, targetArtifacts, enabledMaterials]);
+  }, [selectedSubstats, substatValues, level, exp, targetArtifacts, enabledMaterials, capDivisor]);
 
   useEffect(() => {
     calculate();
@@ -134,8 +135,10 @@ function App() {
         materialUsage={materialUsage}
         givenExp={givenExp}
         enabledMaterials={enabledMaterials}
+        capDivisor={capDivisor}
         onMaterialToggle={handleMaterialToggle}
         onExpGain={handleExpGain}
+        onCapDivisorChange={setCapDivisor}
       />
 
       <div className="margin"></div>

@@ -8,8 +8,10 @@ interface MaterialCalculatorProps {
   materialUsage: MaterialUsage;
   givenExp: number;
   enabledMaterials: { [key: string]: boolean };
+  capDivisor: number;
   onMaterialToggle: (material: string) => void;
   onExpGain: (multiplier: number) => void;
+  onCapDivisorChange: (divisor: number) => void;
 }
 
 export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
@@ -18,8 +20,10 @@ export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
   materialUsage,
   givenExp,
   enabledMaterials,
+  capDivisor,
   onMaterialToggle,
   onExpGain,
+  onCapDivisorChange,
 }) => {
   return (
     <div>
@@ -32,6 +36,19 @@ export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
           <tr>
             <th>exp cap</th>
             <td>{expCap}</td>
+          </tr>
+          <tr>
+            <th>cap divisor</th>
+            <td>
+              <select
+                value={capDivisor}
+                onChange={(e) => onCapDivisorChange(Number(e.target.value))}
+              >
+                <option value={1}>÷1</option>
+                <option value={2}>÷2</option>
+                <option value={5}>÷5</option>
+              </select>
+            </td>
           </tr>
         </tbody>
       </table>
