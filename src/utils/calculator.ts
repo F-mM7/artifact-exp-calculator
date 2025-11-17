@@ -1,5 +1,13 @@
-import type { SubstatType, MaterialUsage, TargetArtifact } from '../types';
-import { SUBSTATS, CUM_EXP, MATERIALS, MAX_MATERIALS } from '../constants';
+import type { SubstatType, MaterialUsage, TargetArtifact, ArtifactRarity } from '../types';
+import { SUBSTATS, CUM_EXP_5STAR, CUM_EXP_4STAR, MAX_LEVEL_5STAR, MAX_LEVEL_4STAR, MATERIALS, MAX_MATERIALS } from '../constants';
+
+function getCumExp(rarity: ArtifactRarity): number[] {
+  return rarity === 5 ? CUM_EXP_5STAR : CUM_EXP_4STAR;
+}
+
+function getMaxLevel(rarity: ArtifactRarity): number {
+  return rarity === 5 ? MAX_LEVEL_5STAR : MAX_LEVEL_4STAR;
+}
 
 export function display(x: number): string {
   return (Math.round(x * 10) / 10).toFixed(1);
@@ -30,15 +38,18 @@ export function calculateExpRequirement(
   currentExp: number,
   requiredEnhances: number,
   capDivisor: number = 2,
-  manualTargetLevel?: number
+  manualTargetLevel?: number,
+  rarity: ArtifactRarity = 5
 ): { expReq: number; expCap: number } {
-  const autoTargetLevel = Math.min(20, (6 - requiredEnhances) * 4);
+  const cumExp = getCumExp(rarity);
+  const maxLevel = getMaxLevel(rarity);
+  const autoTargetLevel = Math.min(maxLevel, (6 - requiredEnhances) * 4);
   const targetLevel = manualTargetLevel !== undefined ? manualTargetLevel : autoTargetLevel;
-  const totalCurrentExp = currentExp + CUM_EXP[currentLevel];
-  const targetExp = CUM_EXP[Math.max(targetLevel, currentLevel)];
+  const totalCurrentExp = currentExp + cumExp[currentLevel];
+  const targetExp = cumExp[Math.max(targetLevel, currentLevel)];
 
   const expReq = targetExp - totalCurrentExp;
-  const expCap = (CUM_EXP[20] - totalCurrentExp) / capDivisor;
+  const expCap = (cumExp[maxLevel] - totalCurrentExp) / capDivisor;
 
   return { expReq, expCap };
 }
@@ -157,17 +168,20 @@ export function calculateRequiredEnhances(
 export function applyExpGain(
   currentLevel: number,
   currentExp: number,
-  expGain: number
+  expGain: number,
+  rarity: ArtifactRarity = 5
 ): { level: number; exp: number } {
+  const cumExp = getCumExp(rarity);
+  const maxLevel = getMaxLevel(rarity);
   let level = currentLevel;
-  let exp = currentExp + CUM_EXP[level] + expGain;
+  let exp = currentExp + cumExp[level] + expGain;
 
-  while (level < 20 && CUM_EXP[level + 1] <= exp) {
+  while (level < maxLevel && cumExp[level + 1] <= exp) {
     level++;
   }
 
   return {
     level,
-    exp: exp - CUM_EXP[level],
+    exp: exp - cumExp[level],
   };
 }

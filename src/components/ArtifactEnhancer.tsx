@@ -8,6 +8,7 @@ interface ArtifactEnhancerProps {
   exp: number;
   selectedSubstats: SubstatType[];
   substatValues: { [key: string]: number };
+  maxLevel: number;
   onLevelChange: (level: number) => void;
   onExpChange: (exp: number) => void;
   onSubstatValueChange: (substat: string, value: number) => void;
@@ -18,6 +19,7 @@ export const ArtifactEnhancer: React.FC<ArtifactEnhancerProps> = ({
   exp,
   selectedSubstats,
   substatValues,
+  maxLevel,
   onLevelChange,
   onExpChange,
   onSubstatValueChange,
@@ -43,8 +45,8 @@ export const ArtifactEnhancer: React.FC<ArtifactEnhancerProps> = ({
                 type="number"
                 value={level}
                 min={0}
-                max={20}
-                onChange={(e) => onLevelChange(Number(e.target.value))}
+                max={maxLevel}
+                onChange={(e) => onLevelChange(Math.min(Number(e.target.value), maxLevel))}
               />
             </td>
           </tr>
@@ -55,7 +57,6 @@ export const ArtifactEnhancer: React.FC<ArtifactEnhancerProps> = ({
                 type="number"
                 value={exp}
                 min={0}
-                max={35574}
                 onChange={(e) => onExpChange(Number(e.target.value))}
               />
             </td>

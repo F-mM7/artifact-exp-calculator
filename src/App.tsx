@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { SubstatType, TargetArtifact, MaterialUsage } from './types';
-import { SUBSTATS } from './constants';
+import type { SubstatType, TargetArtifact, MaterialUsage, ArtifactRarity } from './types';
+import { SUBSTATS, MAX_LEVEL_5STAR, MAX_LEVEL_4STAR } from './constants';
 import {
   calculateExpRequirement,
   calculateMaterialUsage,
@@ -17,6 +17,7 @@ import { TargetArtifactManager } from './components/TargetArtifactManager';
 import './App.css';
 
 function App() {
+  const [rarity, setRarity] = useState<ArtifactRarity>(5);
   const [selectedSubstats, setSelectedSubstats] = useState<SubstatType[]>(['CRIT_Rate', 'CRIT_DMG']);
   const [substatValues, setSubstatValues] = useState<{ [key: string]: number }>({});
   const [level, setLevel] = useState(4);
@@ -45,6 +46,8 @@ function App() {
   const [useManualTargetLevel, setUseManualTargetLevel] = useState(false);
   const [manualTargetLevel, setManualTargetLevel] = useState(8);
 
+  const maxLevel = rarity === 5 ? MAX_LEVEL_5STAR : MAX_LEVEL_4STAR;
+
   // Initialize substat values when selected substats change
   useEffect(() => {
     const newValues: { [key: string]: number } = {};
@@ -61,7 +64,7 @@ function App() {
   const calculate = useCallback(() => {
     const requiredEnhances = calculateRequiredEnhances(selectedSubstats, substatValues, targetArtifacts);
     const targetLevel = useManualTargetLevel ? manualTargetLevel : undefined;
-    const { expReq: calcExpReq, expCap: calcExpCap } = calculateExpRequirement(level, exp, requiredEnhances, capDivisor, targetLevel);
+    const { expReq: calcExpReq, expCap: calcExpCap } = calculateExpRequirement(level, exp, requiredEnhances, capDivisor, targetLevel, rarity);
 
     setExpReq(calcExpReq);
     setExpCap(calcExpCap);
@@ -71,7 +74,7 @@ function App() {
 
     setMaterialUsage(usage);
     setGivenExp(totalExp);
-  }, [selectedSubstats, substatValues, level, exp, targetArtifacts, enabledMaterials, capDivisor, useManualTargetLevel, manualTargetLevel]);
+  }, [selectedSubstats, substatValues, level, exp, targetArtifacts, enabledMaterials, capDivisor, useManualTargetLevel, manualTargetLevel, rarity]);
 
   useEffect(() => {
     calculate();
@@ -107,9 +110,26 @@ function App() {
 
   const handleExpGain = (multiplier: number) => {
     const totalGain = givenExp * multiplier;
-    const result = applyExpGain(level, exp, totalGain);
+    const result = applyExpGain(level, exp, totalGain, rarity);
     setLevel(result.level);
     setExp(result.exp);
+  };
+
+  const handleRarityChange = (newRarity: ArtifactRarity) => {
+    setRarity(newRarity);
+    const newMaxLevel = newRarity === 5 ? MAX_LEVEL_5STAR : MAX_LEVEL_4STAR;
+    // Reset level if it exceeds new max
+    if (level > newMaxLevel) {
+      setLevel(newMaxLevel);
+    }
+    // Adjust manual target level if needed
+    if (manualTargetLevel > newMaxLevel) {
+      setManualTargetLevel(newMaxLevel);
+    }
+    // Clear target artifacts as they're not supported for 4-star
+    if (newRarity === 4) {
+      setTargetArtifacts([]);
+    }
   };
 
   const handleAddArtifacts = (artifacts: TargetArtifact[]) => {
@@ -122,6 +142,19 @@ function App() {
 
   return (
     <div className="App">
+      <div>
+        <label>Rarity: </label>
+        <select
+          value={rarity}
+          onChange={(e) => handleRarityChange(Number(e.target.value) as ArtifactRarity)}
+        >
+          <option value={5}>★5</option>
+          <option value={4}>★4</option>
+        </select>
+      </div>
+
+      <div className="margin"></div>
+
       <SubstatSelector
         selectedSubstats={selectedSubstats}
         onSubstatChange={handleSubstatChange}
@@ -134,6 +167,7 @@ function App() {
         exp={exp}
         selectedSubstats={selectedSubstats}
         substatValues={substatValues}
+        maxLevel={maxLevel}
         onLevelChange={handleLevelChange}
         onExpChange={setExp}
         onSubstatValueChange={handleSubstatValueChange}
@@ -150,6 +184,7 @@ function App() {
         capDivisor={capDivisor}
         useManualTargetLevel={useManualTargetLevel}
         manualTargetLevel={manualTargetLevel}
+        maxLevel={maxLevel}
         onMaterialToggle={handleMaterialToggle}
         onExpGain={handleExpGain}
         onCapDivisorChange={setCapDivisor}
@@ -159,12 +194,14 @@ function App() {
 
       <div className="margin"></div>
 
-      <TargetArtifactManager
-        selectedSubstats={selectedSubstats}
-        targetArtifacts={targetArtifacts}
-        onAddArtifacts={handleAddArtifacts}
-        onClearArtifacts={handleClearArtifacts}
-      />
+      {rarity === 5 && (
+        <TargetArtifactManager
+          selectedSubstats={selectedSubstats}
+          targetArtifacts={targetArtifacts}
+          onAddArtifacts={handleAddArtifacts}
+          onClearArtifacts={handleClearArtifacts}
+        />
+      )}
     </div>
   );
 }

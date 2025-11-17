@@ -2,6 +2,8 @@ export type SubstatType = 'DEF' | 'Energy_Recharge' | 'CRIT_Rate' | 'CRIT_DMG';
 
 export type MaterialType = 'lv1' | 'lv2' | 'lv3' | 'lv4' | 'unc' | 'ess';
 
+export type ArtifactRarity = 4 | 5;
+
 export interface SubstatValues {
   [key: string]: number;
 }

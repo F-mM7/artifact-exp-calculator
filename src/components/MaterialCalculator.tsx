@@ -11,6 +11,7 @@ interface MaterialCalculatorProps {
   capDivisor: number;
   useManualTargetLevel: boolean;
   manualTargetLevel: number;
+  maxLevel: number;
   onMaterialToggle: (material: string) => void;
   onExpGain: (multiplier: number) => void;
   onCapDivisorChange: (divisor: number) => void;
@@ -27,6 +28,7 @@ export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
   capDivisor,
   useManualTargetLevel,
   manualTargetLevel,
+  maxLevel,
   onMaterialToggle,
   onExpGain,
   onCapDivisorChange,
@@ -70,11 +72,11 @@ export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
               <input
                 type="number"
                 min={0}
-                max={20}
+                max={maxLevel}
                 step={4}
                 value={manualTargetLevel}
                 disabled={!useManualTargetLevel}
-                onChange={(e) => onManualTargetLevelChange(Number(e.target.value))}
+                onChange={(e) => onManualTargetLevelChange(Math.min(Number(e.target.value), maxLevel))}
                 style={{ width: '60px', marginLeft: '0.25rem' }}
               />
             </td>
