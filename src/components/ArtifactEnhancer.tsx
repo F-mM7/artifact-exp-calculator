@@ -70,35 +70,38 @@ export const ArtifactEnhancer: React.FC<ArtifactEnhancerProps> = ({
       </table>
       <table id="enhancing">
         <tbody>
-          {selectedSubstats.map((substat) => (
-            <tr key={substat}>
-              <th>{substat}</th>
-              <td>
-                <input
-                  type="number"
-                  step={0.1}
-                  min={0}
-                  max={display((SUBSTATS[substat] / 8) * 6)}
-                  value={substatValues[substat] !== undefined ? substatValues[substat] : display((SUBSTATS[substat] / 8) * 0.9)}
-                  onChange={(e) => onSubstatValueChange(substat, Number(e.target.value))}
-                />
-              </td>
-              <button
-                className="pm"
-                tabIndex={-1}
-                onClick={() => handleSubstatAdjustment(substat, (SUBSTATS[substat] / 8) * 0.85)}
-              >
-                +
-              </button>
-              <button
-                className="pm"
-                tabIndex={-1}
-                onClick={() => handleSubstatAdjustment(substat, -(SUBSTATS[substat] / 8) * 0.85)}
-              >
-                -
-              </button>
-            </tr>
-          ))}
+          {(Object.keys(SUBSTATS) as SubstatType[]).map((substat) => {
+            const isSelected = selectedSubstats.includes(substat);
+            return (
+              <tr key={substat} style={{ visibility: isSelected ? 'visible' : 'hidden' }}>
+                <th>{substat}</th>
+                <td>
+                  <input
+                    type="number"
+                    step={0.1}
+                    min={0}
+                    max={display((SUBSTATS[substat] / 8) * 6)}
+                    value={substatValues[substat] !== undefined ? substatValues[substat] : display((SUBSTATS[substat] / 8) * 0.9)}
+                    onChange={(e) => onSubstatValueChange(substat, Number(e.target.value))}
+                  />
+                </td>
+                <button
+                  className="pm"
+                  tabIndex={-1}
+                  onClick={() => handleSubstatAdjustment(substat, (SUBSTATS[substat] / 8) * 0.85)}
+                >
+                  +
+                </button>
+                <button
+                  className="pm"
+                  tabIndex={-1}
+                  onClick={() => handleSubstatAdjustment(substat, -(SUBSTATS[substat] / 8) * 0.85)}
+                >
+                  -
+                </button>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

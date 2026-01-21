@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { SubstatType, TargetArtifact } from '../types';
+import { SUBSTATS } from '../constants';
 
 interface TargetArtifactManagerProps {
   selectedSubstats: SubstatType[];
@@ -65,9 +66,12 @@ export const TargetArtifactManager: React.FC<TargetArtifactManagerProps> = ({
         <table id="table">
           <thead>
             <tr>
-              {selectedSubstats.map((substat) => (
-                <th key={substat}>{substat}</th>
-              ))}
+              {(Object.keys(SUBSTATS) as SubstatType[]).map((substat) => {
+                const isSelected = selectedSubstats.includes(substat);
+                return (
+                  <th key={substat} style={{ visibility: isSelected ? 'visible' : 'hidden' }}>{substat}</th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
@@ -76,9 +80,14 @@ export const TargetArtifactManager: React.FC<TargetArtifactManagerProps> = ({
                 key={index}
                 className={artifact.validity ? 'data' : 'data invalid'}
               >
-                {artifact.val.map((value, i) => (
-                  <td key={i}>{value.toFixed(1)}</td>
-                ))}
+                {(Object.keys(SUBSTATS) as SubstatType[]).map((substat, i) => {
+                  const isSelected = selectedSubstats.includes(substat);
+                  const selectedIndex = selectedSubstats.indexOf(substat);
+                  const value = selectedIndex >= 0 ? artifact.val[selectedIndex] : 0;
+                  return (
+                    <td key={i} style={{ visibility: isSelected ? 'visible' : 'hidden' }}>{value.toFixed(1)}</td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>
