@@ -142,15 +142,20 @@ function App() {
 
   return (
     <div className="App">
-      <div>
+      <div className="rarity-buttons">
         <label>Rarity: </label>
-        <select
-          value={rarity}
-          onChange={(e) => handleRarityChange(Number(e.target.value) as ArtifactRarity)}
+        <button
+          className={rarity === 5 ? 'active' : ''}
+          onClick={() => handleRarityChange(5)}
         >
-          <option value={5}>★5</option>
-          <option value={4}>★4</option>
-        </select>
+          ★5
+        </button>
+        <button
+          className={rarity === 4 ? 'active' : ''}
+          onClick={() => handleRarityChange(4)}
+        >
+          ★4
+        </button>
       </div>
 
       <div className="margin"></div>
@@ -194,14 +199,14 @@ function App() {
 
       <div className="margin"></div>
 
-      {rarity === 5 && (
+      <div style={{ visibility: rarity === 5 ? 'visible' : 'hidden' }}>
         <TargetArtifactManager
           selectedSubstats={selectedSubstats}
           targetArtifacts={targetArtifacts}
           onAddArtifacts={handleAddArtifacts}
           onClearArtifacts={handleClearArtifacts}
         />
-      )}
+      </div>
     </div>
   );
 }
