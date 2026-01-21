@@ -20,7 +20,7 @@ function App() {
   const [rarity, setRarity] = useState<ArtifactRarity>(5);
   const [selectedSubstats, setSelectedSubstats] = useState<SubstatType[]>(['CRIT_Rate', 'CRIT_DMG']);
   const [substatValues, setSubstatValues] = useState<{ [key: string]: number }>({});
-  const [level, setLevel] = useState(4);
+  const [level, setLevel] = useState(0);
   const [exp, setExp] = useState(0);
   const [materialUsage, setMaterialUsage] = useState<MaterialUsage>({
     lv1: 0,
@@ -36,7 +36,7 @@ function App() {
     lv3: true,
     lv4: true,
     unc: true,
-    ess: true,
+    ess: false,
   });
   const [targetArtifacts, setTargetArtifacts] = useState<TargetArtifact[]>([]);
   const [expReq, setExpReq] = useState(0);
