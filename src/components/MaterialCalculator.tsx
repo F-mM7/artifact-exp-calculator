@@ -90,13 +90,13 @@ export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
           {Object.entries(MATERIALS).map(([material, _]) => (
             <tr key={material}>
               <td>
-                <input
-                  type="checkbox"
-                  checked={enabledMaterials[material] || false}
-                  onChange={() => onMaterialToggle(material)}
-                />
+                <button
+                  className={`toggle-btn material ${enabledMaterials[material] ? 'active' : ''}`}
+                  onClick={() => onMaterialToggle(material)}
+                >
+                  {material}
+                </button>
               </td>
-              <td>{material}</td>
               <td>{materialUsage[material as keyof MaterialUsage]}</td>
             </tr>
           ))}

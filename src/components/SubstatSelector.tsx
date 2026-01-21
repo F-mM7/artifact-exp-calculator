@@ -24,17 +24,15 @@ export const SubstatSelector: React.FC<SubstatSelectorProps> = ({
   return (
     <div>
       <div>Select Substats</div>
-      <div id="select">
+      <div className="substat-buttons">
         {Object.keys(SUBSTATS).map((substat) => (
-          <div key={substat}>
-            <input
-              type="checkbox"
-              id={`${substat}_checkbox`}
-              checked={selectedSubstats.includes(substat as SubstatType)}
-              onChange={() => handleCheckboxChange(substat as SubstatType)}
-            />
-            <label htmlFor={`${substat}_checkbox`}>{substat}</label>
-          </div>
+          <button
+            key={substat}
+            className={`toggle-btn ${selectedSubstats.includes(substat as SubstatType) ? 'active' : ''}`}
+            onClick={() => handleCheckboxChange(substat as SubstatType)}
+          >
+            {substat}
+          </button>
         ))}
       </div>
     </div>

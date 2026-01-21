@@ -1,3 +1,41 @@
+/* ==== Toggle Buttons ==== */
+
+.toggle-btn {
+  padding: 0.4rem 0.75rem;
+  border: 2px solid #3a3a3a;
+  border-radius: 6px;
+  background-color: transparent;
+  color: #888;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 0.85rem;
+}
+
+.toggle-btn:hover {
+  border-color: #646cff;
+  color: #aaa;
+}
+
+.toggle-btn.active {
+  background-color: #646cff;
+  border-color: #646cff;
+  color: white;
+}
+
+.toggle-btn.material {
+  padding: 0.2rem 0.5rem;
+  min-width: 3rem;
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
+.substat-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
 .rarity-buttons button.active,
 .target-level-buttons button.active,
 .cap-divisor-buttons button.active {
@@ -65,9 +103,6 @@ input[type="number"] {
   width: 80px;
 }
 
-input[type="checkbox"] {
-  margin-right: 0.5rem;
-}
 
 textarea {
   width: 300px;
@@ -81,11 +116,6 @@ button {
   cursor: pointer;
 }
 
-#select div {
-  display: inline-block;
-  margin-right: 1rem;
-  margin-bottom: 0.5rem;
-}
 
 #alert {
   color: red;
