@@ -51,6 +51,9 @@ export const ArtifactEnhancer: React.FC<ArtifactEnhancerProps> = ({
                 onChange={(e) => onLevelChange(Math.min(Number(e.target.value), maxLevel))}
               />
             </td>
+            <td rowSpan={2} style={{ verticalAlign: 'middle' }}>
+              <button onClick={onReset}>Reset</button>
+            </td>
           </tr>
           <tr>
             <th>Exp</th>
@@ -61,12 +64,6 @@ export const ArtifactEnhancer: React.FC<ArtifactEnhancerProps> = ({
                 min={0}
                 onChange={(e) => onExpChange(Number(e.target.value))}
               />
-            </td>
-          </tr>
-          <tr>
-            <th></th>
-            <td>
-              <button onClick={onReset}>Reset</button>
             </td>
           </tr>
         </tbody>

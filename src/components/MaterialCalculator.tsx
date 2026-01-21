@@ -18,6 +18,7 @@ interface MaterialCalculatorProps {
 }
 
 const TARGET_LEVELS = ['auto', 4, 8, 12, 16, 20] as const;
+const CAP_DIVISORS = [1, 2, 5] as const;
 
 export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
   expReq,
@@ -38,27 +39,6 @@ export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
       <table>
         <tbody>
           <tr>
-            <th>exp req</th>
-            <td>{expReq}</td>
-          </tr>
-          <tr>
-            <th>exp cap</th>
-            <td>{expCap}</td>
-          </tr>
-          <tr>
-            <th>cap divisor</th>
-            <td>
-              <select
-                value={capDivisor}
-                onChange={(e) => onCapDivisorChange(Number(e.target.value))}
-              >
-                <option value={1}>÷1</option>
-                <option value={2}>÷2</option>
-                <option value={5}>÷5</option>
-              </select>
-            </td>
-          </tr>
-          <tr>
             <th>target level</th>
             <td>
               <div className="target-level-buttons">
@@ -76,6 +56,30 @@ export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
                     </button>
                   );
                 })}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th>exp req</th>
+            <td>{expReq}</td>
+          </tr>
+          <tr>
+            <th>exp cap</th>
+            <td>{expCap}</td>
+          </tr>
+          <tr>
+            <th>cap divisor</th>
+            <td>
+              <div className="cap-divisor-buttons">
+                {CAP_DIVISORS.map((divisor) => (
+                  <button
+                    key={divisor}
+                    className={capDivisor === divisor ? 'active' : ''}
+                    onClick={() => onCapDivisorChange(divisor)}
+                  >
+                    ÷{divisor}
+                  </button>
+                ))}
               </div>
             </td>
           </tr>

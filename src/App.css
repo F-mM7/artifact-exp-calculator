@@ -1,12 +1,18 @@
 .rarity-buttons button.active,
-.target-level-buttons button.active {
+.target-level-buttons button.active,
+.cap-divisor-buttons button.active {
   background-color: #646cff;
   color: white;
 }
 
-.target-level-buttons {
+.target-level-buttons,
+.cap-divisor-buttons {
   display: flex;
   gap: 0.25rem;
+}
+
+.target-level-buttons button {
+  min-width: 2.5rem;
 }
 
 .target-level-buttons button:disabled {
