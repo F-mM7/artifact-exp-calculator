@@ -43,8 +43,7 @@ function App() {
   const [expCap, setExpCap] = useState(0);
   const [givenExp, setGivenExp] = useState(0);
   const [capDivisor, setCapDivisor] = useState(2);
-  const [useManualTargetLevel, setUseManualTargetLevel] = useState(false);
-  const [manualTargetLevel, setManualTargetLevel] = useState(8);
+  const [targetLevel, setTargetLevel] = useState<number | 'auto'>('auto');
 
   const maxLevel = rarity === 5 ? MAX_LEVEL_5STAR : MAX_LEVEL_4STAR;
 
@@ -63,8 +62,8 @@ function App() {
 
   const calculate = useCallback(() => {
     const requiredEnhances = calculateRequiredEnhances(selectedSubstats, substatValues, targetArtifacts);
-    const targetLevel = useManualTargetLevel ? manualTargetLevel : undefined;
-    const { expReq: calcExpReq, expCap: calcExpCap } = calculateExpRequirement(level, exp, requiredEnhances, capDivisor, targetLevel, rarity);
+    const manualTargetLevel = targetLevel === 'auto' ? undefined : targetLevel;
+    const { expReq: calcExpReq, expCap: calcExpCap } = calculateExpRequirement(level, exp, requiredEnhances, capDivisor, manualTargetLevel, rarity);
 
     setExpReq(calcExpReq);
     setExpCap(calcExpCap);
@@ -74,7 +73,7 @@ function App() {
 
     setMaterialUsage(usage);
     setGivenExp(totalExp);
-  }, [selectedSubstats, substatValues, level, exp, targetArtifacts, enabledMaterials, capDivisor, useManualTargetLevel, manualTargetLevel, rarity]);
+  }, [selectedSubstats, substatValues, level, exp, targetArtifacts, enabledMaterials, capDivisor, targetLevel, rarity]);
 
   useEffect(() => {
     calculate();
@@ -94,11 +93,6 @@ function App() {
 
   const handleLevelChange = (newLevel: number) => {
     setLevel(newLevel);
-    // レベルが変更されたら、手動目標レベルも更新
-    if (!useManualTargetLevel) {
-      const nextMultipleOf4 = Math.ceil((newLevel + 1) / 4) * 4;
-      setManualTargetLevel(Math.min(20, nextMultipleOf4));
-    }
   };
 
   const handleMaterialToggle = (material: string) => {
@@ -127,9 +121,9 @@ function App() {
     if (level > newMaxLevel) {
       setLevel(newMaxLevel);
     }
-    // Adjust manual target level if needed
-    if (manualTargetLevel > newMaxLevel) {
-      setManualTargetLevel(newMaxLevel);
+    // Reset target level to auto if it exceeds new max
+    if (typeof targetLevel === 'number' && targetLevel > newMaxLevel) {
+      setTargetLevel('auto');
     }
     // Clear target artifacts as they're not supported for 4-star
     if (newRarity === 4) {
@@ -193,14 +187,12 @@ function App() {
         givenExp={givenExp}
         enabledMaterials={enabledMaterials}
         capDivisor={capDivisor}
-        useManualTargetLevel={useManualTargetLevel}
-        manualTargetLevel={manualTargetLevel}
+        targetLevel={targetLevel}
         maxLevel={maxLevel}
         onMaterialToggle={handleMaterialToggle}
         onExpGain={handleExpGain}
         onCapDivisorChange={setCapDivisor}
-        onManualTargetLevelToggle={setUseManualTargetLevel}
-        onManualTargetLevelChange={setManualTargetLevel}
+        onTargetLevelChange={setTargetLevel}
       />
 
       <div className="margin"></div>

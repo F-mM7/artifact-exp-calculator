@@ -9,15 +9,15 @@ interface MaterialCalculatorProps {
   givenExp: number;
   enabledMaterials: { [key: string]: boolean };
   capDivisor: number;
-  useManualTargetLevel: boolean;
-  manualTargetLevel: number;
+  targetLevel: number | 'auto';
   maxLevel: number;
   onMaterialToggle: (material: string) => void;
   onExpGain: (multiplier: number) => void;
   onCapDivisorChange: (divisor: number) => void;
-  onManualTargetLevelToggle: (enabled: boolean) => void;
-  onManualTargetLevelChange: (level: number) => void;
+  onTargetLevelChange: (level: number | 'auto') => void;
 }
+
+const TARGET_LEVELS = ['auto', 4, 8, 12, 16, 20] as const;
 
 export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
   expReq,
@@ -26,14 +26,12 @@ export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
   givenExp,
   enabledMaterials,
   capDivisor,
-  useManualTargetLevel,
-  manualTargetLevel,
+  targetLevel,
   maxLevel,
   onMaterialToggle,
   onExpGain,
   onCapDivisorChange,
-  onManualTargetLevelToggle,
-  onManualTargetLevelChange,
+  onTargetLevelChange,
 }) => {
   return (
     <div>
@@ -63,22 +61,22 @@ export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
           <tr>
             <th>target level</th>
             <td>
-              <input
-                type="checkbox"
-                checked={useManualTargetLevel}
-                onChange={(e) => onManualTargetLevelToggle(e.target.checked)}
-              />
-              <label>Manual:</label>
-              <input
-                type="number"
-                min={0}
-                max={maxLevel}
-                step={4}
-                value={manualTargetLevel}
-                disabled={!useManualTargetLevel}
-                onChange={(e) => onManualTargetLevelChange(Math.min(Number(e.target.value), maxLevel))}
-                style={{ width: '60px', marginLeft: '0.25rem' }}
-              />
+              <div className="target-level-buttons">
+                {TARGET_LEVELS.map((level) => {
+                  const isDisabled = typeof level === 'number' && level > maxLevel;
+                  const isActive = targetLevel === level;
+                  return (
+                    <button
+                      key={level}
+                      className={isActive ? 'active' : ''}
+                      disabled={isDisabled}
+                      onClick={() => onTargetLevelChange(level)}
+                    >
+                      {level === 'auto' ? '自動' : level}
+                    </button>
+                  );
+                })}
+              </div>
             </td>
           </tr>
         </tbody>

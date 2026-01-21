@@ -1,6 +1,17 @@
-.rarity-buttons button.active {
+.rarity-buttons button.active,
+.target-level-buttons button.active {
   background-color: #646cff;
   color: white;
+}
+
+.target-level-buttons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.target-level-buttons button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .margin {
