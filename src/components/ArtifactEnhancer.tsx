@@ -12,6 +12,7 @@ interface ArtifactEnhancerProps {
   onLevelChange: (level: number) => void;
   onExpChange: (exp: number) => void;
   onSubstatValueChange: (substat: string, value: number) => void;
+  onReset: () => void;
 }
 
 export const ArtifactEnhancer: React.FC<ArtifactEnhancerProps> = ({
@@ -23,6 +24,7 @@ export const ArtifactEnhancer: React.FC<ArtifactEnhancerProps> = ({
   onLevelChange,
   onExpChange,
   onSubstatValueChange,
+  onReset,
 }) => {
   const handleSubstatAdjustment = (substat: string, delta: number) => {
     const currentValue = substatValues[substat] || 0;
@@ -59,6 +61,12 @@ export const ArtifactEnhancer: React.FC<ArtifactEnhancerProps> = ({
                 min={0}
                 onChange={(e) => onExpChange(Number(e.target.value))}
               />
+            </td>
+          </tr>
+          <tr>
+            <th></th>
+            <td>
+              <button onClick={onReset}>Reset</button>
             </td>
           </tr>
         </tbody>

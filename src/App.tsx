@@ -115,6 +115,11 @@ function App() {
     setExp(result.exp);
   };
 
+  const handleReset = () => {
+    setLevel(0);
+    setExp(0);
+  };
+
   const handleRarityChange = (newRarity: ArtifactRarity) => {
     setRarity(newRarity);
     const newMaxLevel = newRarity === 5 ? MAX_LEVEL_5STAR : MAX_LEVEL_4STAR;
@@ -176,6 +181,7 @@ function App() {
         onLevelChange={handleLevelChange}
         onExpChange={setExp}
         onSubstatValueChange={handleSubstatValueChange}
+        onReset={handleReset}
       />
 
       <div className="margin"></div>
