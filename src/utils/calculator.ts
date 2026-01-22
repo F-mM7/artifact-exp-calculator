@@ -1,5 +1,5 @@
 import type { SubstatType, MaterialUsage, TargetArtifact, ArtifactRarity } from '../types';
-import { SUBSTATS, CUM_EXP_5STAR, CUM_EXP_4STAR, MAX_LEVEL_5STAR, MAX_LEVEL_4STAR, MATERIALS, MAX_MATERIALS } from '../constants';
+import { SUBSTATS, CUM_EXP_5STAR, CUM_EXP_4STAR, MAX_LEVEL_5STAR, MAX_LEVEL_4STAR, MATERIALS, MAX_MATERIALS, CALCULATION_CONSTANTS } from '../constants';
 
 function getCumExp(rarity: ArtifactRarity): number[] {
   return rarity === 5 ? CUM_EXP_5STAR : CUM_EXP_4STAR;
@@ -11,6 +11,10 @@ function getMaxLevel(rarity: ArtifactRarity): number {
 
 export function display(x: number): string {
   return (Math.round(x * 10) / 10).toFixed(1);
+}
+
+export function calculateSubstatValue(substat: SubstatType, factor: number): number {
+  return (SUBSTATS[substat] / CALCULATION_CONSTANTS.SUBSTAT_DIVISOR) * factor;
 }
 
 export function enumerateArrays(n: number, m: number): number[][] {
@@ -43,7 +47,7 @@ export function calculateExpRequirement(
 ): { expReq: number; expCap: number } {
   const cumExp = getCumExp(rarity);
   const maxLevel = getMaxLevel(rarity);
-  const autoTargetLevel = Math.min(maxLevel, (6 - requiredEnhances) * 4);
+  const autoTargetLevel = Math.min(maxLevel, (CALCULATION_CONSTANTS.MAX_ENHANCEMENTS - requiredEnhances) * CALCULATION_CONSTANTS.AUTO_LEVEL_OFFSET);
   const targetLevel = manualTargetLevel !== undefined ? manualTargetLevel : autoTargetLevel;
   const totalCurrentExp = currentExp + cumExp[currentLevel];
   const targetExp = cumExp[Math.max(targetLevel, currentLevel)];
@@ -58,7 +62,7 @@ export function calculateMaterialUsage(
   expNeeded: number,
   enabledMaterials: { [key: string]: boolean }
 ): { usage: MaterialUsage; totalExp: number } {
-  let minCost = 280001;
+  let minCost: number = CALCULATION_CONSTANTS.MAX_MATERIAL_COST;
   let bestUsage: MaterialUsage = {
     lv1: 0,
     lv2: 0,
@@ -130,14 +134,14 @@ export function calculateRequiredEnhances(
   targetArtifacts: TargetArtifact[]
 ): number {
   let minEnhances = 100;
-  const arrays = enumerateArrays(selectedSubstats.length, 6);
+  const arrays = enumerateArrays(selectedSubstats.length, CALCULATION_CONSTANTS.MAX_ENHANCEMENTS);
 
   for (const enhanceArray of arrays) {
     const newValues: number[] = [];
 
     for (let i = 0; i < selectedSubstats.length; i++) {
       const substat = selectedSubstats[i];
-      newValues[i] = substatValues[substat] + (SUBSTATS[substat] / 8) * enhanceArray[i];
+      newValues[i] = substatValues[substat] + calculateSubstatValue(substat, enhanceArray[i]);
     }
 
     let isInferior = false;

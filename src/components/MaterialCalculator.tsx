@@ -1,12 +1,16 @@
 import React from 'react';
 import type { MaterialUsage } from '../types';
-import { MATERIALS, FACTOR } from '../constants';
+
+import { TargetLevelSelector } from './TargetLevelSelector';
+import { CapDivisorSelector } from './CapDivisorSelector';
+import { MaterialUsageDisplay } from './MaterialUsageDisplay';
 
 interface MaterialCalculatorProps {
   expReq: number;
   expCap: number;
   materialUsage: MaterialUsage;
   givenExp: number;
+  futureMaterialUsages: MaterialUsage[];
   enabledMaterials: { [key: string]: boolean };
   capDivisor: number;
   targetLevel: number | 'auto';
@@ -17,14 +21,12 @@ interface MaterialCalculatorProps {
   onTargetLevelChange: (level: number | 'auto') => void;
 }
 
-const TARGET_LEVELS = ['auto', 4, 8, 12, 16, 20] as const;
-const CAP_DIVISORS = [1, 2, 5] as const;
-
 export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
   expReq,
   expCap,
   materialUsage,
   givenExp,
+  futureMaterialUsages,
   enabledMaterials,
   capDivisor,
   targetLevel,
@@ -38,27 +40,11 @@ export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
     <div>
       <table>
         <tbody>
-          <tr>
-            <th>target level</th>
-            <td>
-              <div className="target-level-buttons">
-                {TARGET_LEVELS.map((level) => {
-                  const isDisabled = typeof level === 'number' && level > maxLevel;
-                  const isActive = targetLevel === level;
-                  return (
-                    <button
-                      key={level}
-                      className={isActive ? 'active' : ''}
-                      disabled={isDisabled}
-                      onClick={() => onTargetLevelChange(level)}
-                    >
-                      {level === 'auto' ? '自動' : level}
-                    </button>
-                  );
-                })}
-              </div>
-            </td>
-          </tr>
+          <TargetLevelSelector
+            targetLevel={targetLevel}
+            maxLevel={maxLevel}
+            onTargetLevelChange={onTargetLevelChange}
+          />
           <tr>
             <th>exp req</th>
             <td>{expReq}</td>
@@ -67,50 +53,20 @@ export const MaterialCalculator: React.FC<MaterialCalculatorProps> = ({
             <th>exp cap</th>
             <td>{expCap}</td>
           </tr>
-          <tr>
-            <th>cap divisor</th>
-            <td>
-              <div className="cap-divisor-buttons">
-                {CAP_DIVISORS.map((divisor) => (
-                  <button
-                    key={divisor}
-                    className={capDivisor === divisor ? 'active' : ''}
-                    onClick={() => onCapDivisorChange(divisor)}
-                  >
-                    ÷{divisor}
-                  </button>
-                ))}
-              </div>
-            </td>
-          </tr>
+          <CapDivisorSelector
+            capDivisor={capDivisor}
+            onCapDivisorChange={onCapDivisorChange}
+          />
         </tbody>
       </table>
-      <table id="mat">
-        <tbody>
-          {Object.entries(MATERIALS).map(([material, _]) => (
-            <tr key={material}>
-              <td>
-                <button
-                  className={`toggle-btn material ${enabledMaterials[material] ? 'active' : ''}`}
-                  onClick={() => onMaterialToggle(material)}
-                >
-                  {material}
-                </button>
-              </td>
-              <td>{materialUsage[material as keyof MaterialUsage]}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <input id="given" value={givenExp} readOnly />
-      {FACTOR.map((factor) => (
-        <button
-          key={factor}
-          onClick={() => onExpGain(factor)}
-        >
-          x{factor}
-        </button>
-      ))}
+      <MaterialUsageDisplay
+        materialUsage={materialUsage}
+        givenExp={givenExp}
+        futureMaterialUsages={futureMaterialUsages}
+        enabledMaterials={enabledMaterials}
+        onMaterialToggle={onMaterialToggle}
+        onExpGain={onExpGain}
+      />
     </div>
   );
 };

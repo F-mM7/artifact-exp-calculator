@@ -122,3 +122,19 @@ button {
   font-weight: bold;
   margin-left: 0.5rem;
 }
+
+.material-tables {
+  display: flex;
+  gap: 1rem;
+}
+
+.section-label {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.mat-cell {
+  width: 2rem;
+  min-width: 2rem;
+  text-align: center;
+}

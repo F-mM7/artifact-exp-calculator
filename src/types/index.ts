@@ -8,6 +8,10 @@ export interface SubstatValues {
   [key: string]: number;
 }
 
+// Stricter type aliases for better type safety
+export type SubstatValuesStrict = Partial<Record<SubstatType, number>>;
+export type MaterialToggleState = Record<MaterialType, boolean>;
+
 export interface MaterialValues {
   lv1: number;
   lv2: number;

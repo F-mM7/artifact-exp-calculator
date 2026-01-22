@@ -1,13 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
-import type { SubstatType, TargetArtifact, MaterialUsage, ArtifactRarity } from './types';
-import { SUBSTATS, MAX_LEVEL_5STAR, MAX_LEVEL_4STAR } from './constants';
-import {
-  calculateExpRequirement,
-  calculateMaterialUsage,
-  calculateRequiredEnhances,
-  applyExpGain,
-  display,
-} from './utils/calculator';
+import { useState, useCallback } from 'react';
+import type { SubstatType, TargetArtifact, ArtifactRarity, MaterialToggleState, MaterialType } from './types';
+import { MAX_LEVEL_5STAR, MAX_LEVEL_4STAR } from './constants';
+import { applyExpGain } from './utils/calculator';
+
+import { useArtifactState } from './hooks/useArtifactState';
+import { useSubstatManager } from './hooks/useSubstatManager';
+import { useMaterialCalculation } from './hooks/useMaterialCalculation';
 
 import { SubstatSelector } from './components/SubstatSelector';
 import { ArtifactEnhancer } from './components/ArtifactEnhancer';
@@ -17,20 +15,25 @@ import { TargetArtifactManager } from './components/TargetArtifactManager';
 import './App.css';
 
 function App() {
-  const [rarity, setRarity] = useState<ArtifactRarity>(5);
-  const [selectedSubstats, setSelectedSubstats] = useState<SubstatType[]>(['CRIT_Rate', 'CRIT_DMG']);
-  const [substatValues, setSubstatValues] = useState<{ [key: string]: number }>({});
-  const [level, setLevel] = useState(0);
-  const [exp, setExp] = useState(0);
-  const [materialUsage, setMaterialUsage] = useState<MaterialUsage>({
-    lv1: 0,
-    lv2: 0,
-    lv3: 0,
-    lv4: 0,
-    unc: 0,
-    ess: 0,
-  });
-  const [enabledMaterials, setEnabledMaterials] = useState<{ [key: string]: boolean }>({
+  const {
+    rarity,
+    level,
+    exp,
+    maxLevel,
+    setRarity,
+    setLevel,
+    setExp,
+    reset,
+  } = useArtifactState();
+
+  const {
+    selectedSubstats,
+    substatValues,
+    setSelectedSubstats,
+    setSubstatValues,
+  } = useSubstatManager();
+
+  const [enabledMaterials, setEnabledMaterials] = useState<MaterialToggleState>({
     lv1: true,
     lv2: true,
     lv3: true,
@@ -39,105 +42,65 @@ function App() {
     ess: false,
   });
   const [targetArtifacts, setTargetArtifacts] = useState<TargetArtifact[]>([]);
-  const [expReq, setExpReq] = useState(0);
-  const [expCap, setExpCap] = useState(0);
-  const [givenExp, setGivenExp] = useState(0);
   const [capDivisor, setCapDivisor] = useState(2);
   const [targetLevel, setTargetLevel] = useState<number | 'auto'>('auto');
 
-  const maxLevel = rarity === 5 ? MAX_LEVEL_5STAR : MAX_LEVEL_4STAR;
+  const {
+    materialUsage,
+    expReq,
+    expCap,
+    givenExp,
+    futureMaterialUsages,
+  } = useMaterialCalculation({
+    selectedSubstats,
+    substatValues,
+    level,
+    exp,
+    targetArtifacts,
+    enabledMaterials,
+    capDivisor,
+    targetLevel,
+    rarity,
+  });
 
-  // Initialize substat values when selected substats change
-  useEffect(() => {
-    const newValues: { [key: string]: number } = {};
-    selectedSubstats.forEach(substat => {
-      if (!(substat in substatValues)) {
-        newValues[substat] = parseFloat(display((SUBSTATS[substat] / 8) * 0.9));
-      } else {
-        newValues[substat] = substatValues[substat];
-      }
-    });
-    setSubstatValues(newValues);
-  }, [selectedSubstats]);
-
-  const calculate = useCallback(() => {
-    const requiredEnhances = calculateRequiredEnhances(selectedSubstats, substatValues, targetArtifacts);
-    const manualTargetLevel = targetLevel === 'auto' ? undefined : targetLevel;
-    const { expReq: calcExpReq, expCap: calcExpCap } = calculateExpRequirement(level, exp, requiredEnhances, capDivisor, manualTargetLevel, rarity);
-
-    setExpReq(calcExpReq);
-    setExpCap(calcExpCap);
-
-    const expGive = Math.min(calcExpReq, calcExpCap);
-    const { usage, totalExp } = calculateMaterialUsage(expGive, enabledMaterials);
-
-    setMaterialUsage(usage);
-    setGivenExp(totalExp);
-  }, [selectedSubstats, substatValues, level, exp, targetArtifacts, enabledMaterials, capDivisor, targetLevel, rarity]);
-
-  useEffect(() => {
-    calculate();
-  }, [calculate]);
-
-  const handleSubstatChange = (substats: SubstatType[]) => {
+  const handleSubstatChange = useCallback((substats: SubstatType[]) => {
     setSelectedSubstats(substats);
     setTargetArtifacts([]);
-  };
+  }, [setSelectedSubstats]);
 
-  const handleSubstatValueChange = (substat: string, value: number) => {
-    setSubstatValues(prev => ({
-      ...prev,
-      [substat]: value,
-    }));
-  };
-
-  const handleLevelChange = (newLevel: number) => {
-    setLevel(newLevel);
-  };
-
-  const handleMaterialToggle = (material: string) => {
+  const handleMaterialToggle = useCallback((material: string) => {
+    const key = material as MaterialType;
     setEnabledMaterials(prev => ({
       ...prev,
-      [material]: !prev[material],
+      [key]: !prev[key],
     }));
-  };
+  }, []);
 
-  const handleExpGain = (multiplier: number) => {
+  const handleExpGain = useCallback((multiplier: number) => {
     const totalGain = givenExp * multiplier;
     const result = applyExpGain(level, exp, totalGain, rarity);
     setLevel(result.level);
     setExp(result.exp);
-  };
+  }, [givenExp, level, exp, rarity, setLevel, setExp]);
 
-  const handleReset = () => {
-    setLevel(0);
-    setExp(0);
-  };
-
-  const handleRarityChange = (newRarity: ArtifactRarity) => {
+  const handleRarityChange = useCallback((newRarity: ArtifactRarity) => {
     setRarity(newRarity);
     const newMaxLevel = newRarity === 5 ? MAX_LEVEL_5STAR : MAX_LEVEL_4STAR;
-    // Reset level if it exceeds new max
-    if (level > newMaxLevel) {
-      setLevel(newMaxLevel);
-    }
-    // Reset target level to auto if it exceeds new max
     if (typeof targetLevel === 'number' && targetLevel > newMaxLevel) {
       setTargetLevel('auto');
     }
-    // Clear target artifacts as they're not supported for 4-star
     if (newRarity === 4) {
       setTargetArtifacts([]);
     }
-  };
+  }, [setRarity, targetLevel]);
 
-  const handleAddArtifacts = (artifacts: TargetArtifact[]) => {
+  const handleAddArtifacts = useCallback((artifacts: TargetArtifact[]) => {
     setTargetArtifacts(prev => [...prev, ...artifacts]);
-  };
+  }, []);
 
-  const handleClearArtifacts = () => {
+  const handleClearArtifacts = useCallback(() => {
     setTargetArtifacts([]);
-  };
+  }, []);
 
   return (
     <div className="App">
@@ -172,10 +135,10 @@ function App() {
         selectedSubstats={selectedSubstats}
         substatValues={substatValues}
         maxLevel={maxLevel}
-        onLevelChange={handleLevelChange}
+        onLevelChange={setLevel}
         onExpChange={setExp}
-        onSubstatValueChange={handleSubstatValueChange}
-        onReset={handleReset}
+        onSubstatValueChange={setSubstatValues}
+        onReset={reset}
       />
 
       <div className="margin"></div>
@@ -185,6 +148,7 @@ function App() {
         expCap={expCap}
         materialUsage={materialUsage}
         givenExp={givenExp}
+        futureMaterialUsages={futureMaterialUsages}
         enabledMaterials={enabledMaterials}
         capDivisor={capDivisor}
         targetLevel={targetLevel}

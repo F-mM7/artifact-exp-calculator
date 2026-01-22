@@ -1,7 +1,7 @@
 import React from 'react';
 import type { SubstatType } from '../types';
-import { SUBSTATS } from '../constants';
-import { display } from '../utils/calculator';
+import { SUBSTATS, CALCULATION_CONSTANTS } from '../constants';
+import { display, calculateSubstatValue } from '../utils/calculator';
 
 interface ArtifactEnhancerProps {
   level: number;
@@ -29,7 +29,7 @@ export const ArtifactEnhancer: React.FC<ArtifactEnhancerProps> = ({
   const handleSubstatAdjustment = (substat: string, delta: number) => {
     const currentValue = substatValues[substat] || 0;
     const newValue = Math.max(0, Math.min(
-      (SUBSTATS[substat] / 8) * 6,
+      calculateSubstatValue(substat as SubstatType, CALCULATION_CONSTANTS.MAX_ENHANCEMENTS),
       currentValue + delta
     ));
     onSubstatValueChange(substat, parseFloat(display(newValue)));
@@ -80,22 +80,22 @@ export const ArtifactEnhancer: React.FC<ArtifactEnhancerProps> = ({
                     type="number"
                     step={0.1}
                     min={0}
-                    max={display((SUBSTATS[substat] / 8) * 6)}
-                    value={substatValues[substat] !== undefined ? substatValues[substat] : display((SUBSTATS[substat] / 8) * 0.9)}
+                    max={display(calculateSubstatValue(substat, CALCULATION_CONSTANTS.MAX_ENHANCEMENTS))}
+                    value={substatValues[substat] !== undefined ? substatValues[substat] : display(calculateSubstatValue(substat, CALCULATION_CONSTANTS.HIGH_ROLL_MULTIPLIER))}
                     onChange={(e) => onSubstatValueChange(substat, Number(e.target.value))}
                   />
                 </td>
                 <button
                   className="pm"
                   tabIndex={-1}
-                  onClick={() => handleSubstatAdjustment(substat, (SUBSTATS[substat] / 8) * 0.85)}
+                  onClick={() => handleSubstatAdjustment(substat, calculateSubstatValue(substat, CALCULATION_CONSTANTS.LOW_ROLL_MULTIPLIER))}
                 >
                   +
                 </button>
                 <button
                   className="pm"
                   tabIndex={-1}
-                  onClick={() => handleSubstatAdjustment(substat, -(SUBSTATS[substat] / 8) * 0.85)}
+                  onClick={() => handleSubstatAdjustment(substat, -calculateSubstatValue(substat, CALCULATION_CONSTANTS.LOW_ROLL_MULTIPLIER))}
                 >
                   -
                 </button>
