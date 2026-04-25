@@ -1,69 +1,29 @@
-# React + TypeScript + Vite
+# Artifact Experience Calculator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+原神の聖遺物（Artifact）強化に必要な経験値素材の使用量を計算する Web アプリ。
 
-Currently, two official plugins are available:
+🔗 デモ: https://f-mm7.github.io/artifact-exp-calculator/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 機能
 
-## Expanding the ESLint configuration
+- レアリティ（★4 / ★5）の切り替え
+- 強化済みのサブステータス選択と現在値の入力
+- 現在レベル・経験値からの追加強化に必要な経験値素材の自動計算
+- 経験値素材ごとのオン / オフ切り替え（Lv1〜Lv4 経験値素材、聖潔オイル、聖潔エッセンス）
+- 目標レベル指定（任意のレベル / 4 段階ごとの自動）
+- 目標聖遺物の登録（★5 のみ）と将来必要素材の集計
+- 経験値容量の分割比率の調整
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 開発
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev      # 開発サーバ
+npm run build    # ビルド
+npm run lint     # ESLint
+npm run deploy   # gh-pages へデプロイ
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 技術スタック
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+React 19 / TypeScript / Vite / GitHub Pages
